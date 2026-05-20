@@ -1,5 +1,9 @@
 # PowerSpark (Fixed)
 
+<p align="center">
+  <img src="Logo.png" alt="PowerSpark (Fixed) logo" width="120">
+</p>
+
 PowerSpark (Fixed) is an English-documented fork of
 [PowerSpark](https://github.com/starpt/PowerSpark) for World of Warcraft:
 The Burning Crusade Classic / TBC Anniversary clients.
