@@ -1,12 +1,12 @@
-# PowerSparkFixed
+# PowerSpark (Fixed)
 
-PowerSparkFixed is an English-documented fork of
+PowerSpark (Fixed) is an English-documented fork of
 [PowerSpark](https://github.com/starpt/PowerSpark) for World of Warcraft:
 The Burning Crusade Classic / TBC Anniversary clients.
 
-The addon still loads in game as PowerSpark. Install it as
-`Interface\AddOns\PowerSpark` unless the `.toc` file is also renamed to match a
-different addon folder name.
+The addon ID and install folder are `PowerSparkFixed`, so it can be installed
+beside the original `PowerSpark` addon without sharing addon metadata, saved
+variables, or slash commands. In game, it displays as `PowerSpark (Fixed)`.
 
 ## Fork Status
 
@@ -19,7 +19,7 @@ All project documentation in this fork is maintained in English.
 
 ## What The Addon Does
 
-PowerSpark draws a small spark over supported player power bars.
+PowerSpark (Fixed) draws a small spark over supported player power bars.
 
 - For energy users, the spark shows the 2-second energy regeneration cycle.
 - For mana users, the spark shows the 2-second mana regeneration pulse and the
@@ -30,7 +30,8 @@ PowerSpark draws a small spark over supported player power bars.
 - The addon supports Blizzard player bars and optional integrations with
   DruidBarFrame, Shadowed Unit Frames, ElvUI, Statusbars2, and BiechuUnitFrames.
 - Rogue Adrenaline Rush keeps the original 1-second energy interval handling.
-- Settings are available with `/ps` or through Options > AddOns > PowerSpark.
+- Settings are available with `/psf`, `/powersparkfixed`, or through
+  Options > AddOns > PowerSpark (Fixed).
 
 ## What Is Different From Upstream
 
@@ -60,13 +61,14 @@ update, the addon avoids guessing when that would create a worse sync point.
 ## Installation
 
 1. Download or clone this repository.
-2. Copy the addon folder into your WoW install as `Interface\AddOns\PowerSpark`.
+2. Copy the addon folder into your WoW install as
+   `Interface\AddOns\PowerSparkFixed`.
 3. Restart the game or run `/reload`.
 
 For the current local TBC Anniversary install, the addon path is typically:
 
 ```text
-World of Warcraft\_anniversary_\Interface\AddOns\PowerSpark
+World of Warcraft\_anniversary_\Interface\AddOns\PowerSparkFixed
 ```
 
 ## Development

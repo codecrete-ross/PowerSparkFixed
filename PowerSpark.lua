@@ -1,4 +1,4 @@
-PowerSparkDB = PowerSparkDB or {
+PowerSparkFixedDB = PowerSparkFixedDB or {
 	enabled = true,
 	DruidBarFrame = true,
 	SUF = true,
@@ -20,6 +20,9 @@ local ENERGY_TICK_INTERVAL = 2
 local ENERGY_POLL_INTERVAL = .01
 local SKIP_WINDOW = .75
 local TICK_TOLERANCE = .25
+local SPARK_KEY = 'PowerSparkFixedSpark'
+local HOOK_KEY = 'PowerSparkFixedHooked'
+local POWER_TYPE_KEY = 'PowerSparkFixedPowerType'
 frame.resTime = {}
 frame.skip = {}
 frame.energy = {}
@@ -50,7 +53,7 @@ local function isNaturalEnergyGain(delta, previous, current, maxEnergy)
 end
 
 function frame:baselineEnergy()
-	if not PowerSparkDB.enabled then return end
+	if not PowerSparkFixedDB.enabled then return end
 	if playerClass ~= 'DRUID' and playerClass ~= 'ROGUE' then return end
 	self.energy.displayPower = UnitPowerType('player')
 	self.energy.lastValue = UnitPower('player', POWER_ENERGY)
@@ -58,7 +61,7 @@ function frame:baselineEnergy()
 end
 
 function frame:observeEnergy(now, baselineOnly)
-	if not PowerSparkDB.enabled then return end
+	if not PowerSparkFixedDB.enabled then return end
 	if playerClass ~= 'DRUID' and playerClass ~= 'ROGUE' then return end
 	local displayPower = UnitPowerType('player')
 	if self.energy.displayPower and self.energy.displayPower ~= displayPower then
@@ -94,44 +97,46 @@ end
 -- 初始化
 function frame:init(bar, powerType)
 	if not bar then return end
-	if not bar.spark then
-		bar.spark = bar:CreateTexture()
-		bar.spark:SetTexture('Interface\\CastingBar\\UI-CastingBar-Spark')
-		bar.spark:SetBlendMode('ADD')
-		bar.spark:SetSize(28, 28)
-		bar.spark:SetAlpha(.8)
+	if not bar[SPARK_KEY] then
+		bar[SPARK_KEY] = bar:CreateTexture()
+		bar[SPARK_KEY]:SetTexture('Interface\\CastingBar\\UI-CastingBar-Spark')
+		bar[SPARK_KEY]:SetBlendMode('ADD')
+		bar[SPARK_KEY]:SetSize(28, 28)
+		bar[SPARK_KEY]:SetAlpha(.8)
 	end
-	if powerType then bar.powerType = powerType end
-	if bar.PowerSparkHooked then return end
-	bar.PowerSparkHooked = true
+	if powerType then bar[POWER_TYPE_KEY] = powerType end
+	if bar[HOOK_KEY] then return end
+	bar[HOOK_KEY] = true
 
 	bar:HookScript('OnUpdate', function(self)
+		local spark = self[SPARK_KEY]
+		if not spark then return end
 		local now = clock()
-		local powerType = self.powerType or UnitPowerType('player')
+		local powerType = self[POWER_TYPE_KEY] or UnitPowerType('player')
 		local resTime = powerType == POWER_ENERGY and frame.energy.lastTickTime or frame.resTime[powerType]
 
 		if UnitIsDeadOrGhost('player') or
 			powerType ~= POWER_MANA and powerType ~= POWER_ENERGY or
 			not InCombatLockdown() and UnitPower('player', powerType) >= UnitPowerMax('player', powerType) and (
-				powerType == POWER_MANA and PowerSparkDB.maxManaHide or
-				powerType == POWER_ENERGY and not IsStealthed() and not UnitCanAttack('player', 'target') and PowerSparkDB.maxEnergyHide
+				powerType == POWER_MANA and PowerSparkFixedDB.maxManaHide or
+				powerType == POWER_ENERGY and not IsStealthed() and not UnitCanAttack('player', 'target') and PowerSparkFixedDB.maxEnergyHide
 			) then
-			self.spark:Hide()
+			spark:Hide()
 			return
 		end
 		if powerType == POWER_ENERGY and (not frame.energy.synced or type(resTime) ~= 'number') then
-			self.spark:Hide()
+			spark:Hide()
 			return
 		end
-		self.spark:Show()
+		spark:Show()
 		local interval = powerType == POWER_ENERGY and getEnergyInterval(frame) or 2 -- 恢复间隔
 		local width = self:GetWidth()
 		if powerType == POWER_MANA and type(frame.waitTime) == 'number' and frame.waitTime > now then
-			self.spark:ClearAllPoints()
-			self.spark:SetPoint('CENTER', self, 'LEFT', width * (frame.waitTime - now) / 5, 0)
+			spark:ClearAllPoints()
+			spark:SetPoint('CENTER', self, 'LEFT', width * (frame.waitTime - now) / 5, 0)
 		elseif type(resTime) == 'number' and now > resTime then
-			self.spark:ClearAllPoints()
-			self.spark:SetPoint('CENTER', self, 'LEFT', width * (mod(now - resTime, interval) / interval), 0)
+			spark:ClearAllPoints()
+			spark:SetPoint('CENTER', self, 'LEFT', width * (mod(now - resTime, interval) / interval), 0)
 		end
 	end)
 end
@@ -149,7 +154,7 @@ end
 frame:SetScript('OnEvent', function(self, event, unit, powerToken)
 	local now = clock()
 	if event == 'PLAYER_ENTERING_WORLD' then
-		if PowerSparkDB.enabled then
+		if PowerSparkFixedDB.enabled then
 			if UnitPowerType('player') == POWER_MANA or playerClass == 'DRUID' then -- 法力
 				self.lastMana = UnitPower('player', POWER_MANA)
 			end
@@ -163,13 +168,13 @@ frame:SetScript('OnEvent', function(self, event, unit, powerToken)
 			if playerClass == 'DRUID' then
 				self:init(PlayerFrameAlternateManaBar, POWER_MANA)
 				self:init(PlayerFrameDruidBar, POWER_MANA) -- 兼容 BiechuUnitFrames 德鲁伊法力条
-				if PowerSparkDB.DruidBarFrame then self:init(DruidBarFrame, POWER_MANA) end -- 兼容 DruidBarFrame
+				if PowerSparkFixedDB.DruidBarFrame then self:init(DruidBarFrame, POWER_MANA) end -- 兼容 DruidBarFrame
 			end
-			if ElvUF_Player and PowerSparkDB.ElvUI then self:init(ElvUF_Player.Power) end -- 兼容 ElvUI
-			if PowerSparkDB.Statusbars2 then self:init(StatusBars2_playerPowerBar) end -- 兼容 Statusbars2
+			if ElvUF_Player and PowerSparkFixedDB.ElvUI then self:init(ElvUF_Player.Power) end -- 兼容 ElvUI
+			if PowerSparkFixedDB.Statusbars2 then self:init(StatusBars2_playerPowerBar) end -- 兼容 Statusbars2
 
 			-- 兼容 SUF
-			if SUFUnitplayer and PowerSparkDB.SUF then
+			if SUFUnitplayer and PowerSparkFixedDB.SUF then
 				self:init(SUFUnitplayer.powerBar)
 				if playerClass == 'DRUID' then self:init(SUFUnitplayer.druidBar, POWER_MANA) end
 			end
