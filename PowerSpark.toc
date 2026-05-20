@@ -9,7 +9,8 @@
 ## SavedVariablesPerCharacter: PowerSparkDB
 ## IconTexture: Interface\AddOns\PowerSpark\Logo
 ## X-Localizations: enUS, zhCN, ruRU
-## X-Website: http://github.com/starpt/powerspark
+## X-Website: https://github.com/codecrete-ross/PowerSparkFixed
+## X-Upstream: https://github.com/starpt/PowerSpark
 ## X-eMail: starpt@gmail.com
 
 PowerSpark.lua

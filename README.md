@@ -1,56 +1,93 @@
-# PowerSpark
-## 有蓝职业五秒回蓝和盗贼、小德能量恢复监视
+# PowerSparkFixed
 
-1. 在原始能力条从左到右显示2秒法力/能量恢复进度, 从右到左显示5秒法力恢复等待进度
-2. 战士职业不需要,因为战士没有法力或能量恢复
-3. 在死亡或者灵魂状态不显示, 在非战斗状态在满法力后不显示, 在非战斗状态满能量后如果 没有隐身/潜行 或者 可攻击目标不显示
-4. 支持 DruidBarFrame 插件额外德鲁伊法力条
-5. 支持 Shadowed Unit Frames 插件能力条和德鲁伊法力条
-7. 支持 Statusbars2 插件能量条
-6. 支持 ElvUI 插件能力条
-8. 潜行者开启 冲动 技能 能量恢复变为1秒
-9. 得到德鲁伊 激活 Buff期间, 施法后不显示5秒恢复等待进度
-10. 使用 法力药水 生命分流 等技能物品 恢复法力/能量 时, 不会引起2秒恢复错误
-11. 输入/ps 或者进入 选项设置 - 插件 - PowerSpark 进入设置
+PowerSparkFixed is an English-documented fork of
+[PowerSpark](https://github.com/starpt/PowerSpark) for World of Warcraft:
+The Burning Crusade Classic / TBC Anniversary clients.
 
-## 更新记录
+The addon still loads in game as PowerSpark. Install it as
+`Interface\AddOns\PowerSpark` unless the `.toc` file is also renamed to match a
+different addon folder name.
 
-### 2025-01-29 v1.15.1 发布
-1. 支持1.15.5 和 1.15.6 客户端
-2. 重写架构, 修复未知的BUG
+## Fork Status
 
-### 2025-02-02 v1.15.2 发布
-1. 客户端升级,取消支持支持1.15.5
-2. 更新使用说明
-3. 添加输入/ps 或者进入 选项设置 - 插件 - PowerSpark 设置功能
+This repository tracks `starpt/PowerSpark` as `upstream` and keeps local fixes
+in this fork. The fork exists to make the energy spark more reliable on TBC
+Anniversary while preserving the original addon's class behavior wherever the
+game mechanics do not require a difference.
 
-### 2025-02-02 v1.15.3 发布
-1. 修复设置变量未初始化问题
-2. 兼容 BiechuUnitFrames 插件能力条和德鲁伊法力条
-3. 闪动条透明度为0.8
+All project documentation in this fork is maintained in English.
 
-### 2025-02-05 v1.15.4 发布
-1. 修复菊花茶引起能量恢复错乱问题
-2. 修复 BiechuUnitFrames 插件 德鲁伊法力条 不支持问题
-3. 同步法力/能量恢复进度
+## What The Addon Does
 
-### 2025-02-22 v1.15.5 发布
-1. 修复法力之泉恢复错乱问题
+PowerSpark draws a small spark over supported player power bars.
 
-### 2025-02-22 v1.15.6 发布
-1. 修复战士报错问题
+- For energy users, the spark shows the 2-second energy regeneration cycle.
+- For mana users, the spark shows the 2-second mana regeneration pulse and the
+  5-second rule wait after spending mana.
+- The spark hides while the player is dead or in ghost form.
+- Out of combat, the spark can hide at full mana or full energy based on addon
+  options.
+- The addon supports Blizzard player bars and optional integrations with
+  DruidBarFrame, Shadowed Unit Frames, ElvUI, Statusbars2, and BiechuUnitFrames.
+- Rogue Adrenaline Rush keeps the original 1-second energy interval handling.
+- Settings are available with `/ps` or through Options > AddOns > PowerSpark.
 
-### 2025-04-23 v1.15.7 发布
-1. 修复切换天赋引起的5秒恢复等待进度错误问题
-2. 支持 11507 客户端
+## What Is Different From Upstream
 
-### 2025-11-17 v1.15.8 发布
-1. 支持俄语语言
-2. 支持 11508 客户端
+Compared with `starpt/PowerSpark` v1.16.1, this fork currently changes only the
+energy timing and synchronization path.
 
-### 2026-01-26 v1.16.0 发布
-1. 支持 20505 客户端
+- Uses `GetTimePreciseSec()` when available, falling back to `GetTime()`, for
+  finer timing.
+- Moves the spark every rendered frame instead of throttling visual movement to
+  0.02 seconds.
+- Polls hidden energy state every 0.01 seconds to reduce missed first ticks
+  after form changes.
+- Tracks display-power and shapeshift changes so cat-form energy timing can
+  sync sooner.
+- Anchors druid energy timing only on likely natural energy ticks, not on large
+  powershift grants.
+- Keeps rogue mechanics aligned with upstream except for the shared timing
+  precision and smoother visual update changes.
 
-### 2026-02-04 v1.16.1 发布
-1. 修复1.58版本设置错误问题
-2. 增加2.55版本图标显示
+## Accuracy Notes
+
+The addon can only sync to energy changes after the WoW client observes them. It
+cannot know a hidden server tick timestamp before the client receives the update.
+If the game merges a natural tick and another energy gain into one visible
+update, the addon avoids guessing when that would create a worse sync point.
+
+## Installation
+
+1. Download or clone this repository.
+2. Copy the addon folder into your WoW install as `Interface\AddOns\PowerSpark`.
+3. Restart the game or run `/reload`.
+
+For the current local TBC Anniversary install, the addon path is typically:
+
+```text
+World of Warcraft\_anniversary_\Interface\AddOns\PowerSpark
+```
+
+## Development
+
+The original project remote should be kept as `upstream`. This fork's GitHub
+remote should be `origin`.
+
+Useful checks:
+
+```sh
+git diff --check
+```
+
+If Lua tooling is available:
+
+```sh
+luac -p PowerSpark.lua
+```
+
+## Upstream History
+
+The original README changelog covered upstream PowerSpark releases through
+v1.16.1. This fork begins from that version and documents fork-specific changes
+in English going forward.
