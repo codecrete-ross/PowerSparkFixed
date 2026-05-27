@@ -19,6 +19,7 @@ local POWER_TOKENS = {
 local ENERGY_TICK_INTERVAL = 2
 local ENERGY_POLL_INTERVAL = .01
 local SKIP_WINDOW = .75
+local DRUID_FORM_ENERGY_IGNORE_WINDOW = .75
 local TICK_TOLERANCE = .25
 local SPARK_KEY = 'PowerSparkFixedSpark'
 local HOOK_KEY = 'PowerSparkFixedHooked'
@@ -46,10 +47,19 @@ local function getEnergyInterval(self)
 	return self.interval or ENERGY_TICK_INTERVAL
 end
 
+local function isEnergySyncIgnored(self, now)
+	if playerClass ~= 'DRUID' then return end
+	local ignoreUntil = self.energy.ignoreUntil
+	if type(ignoreUntil) ~= 'number' then return end
+	if now <= ignoreUntil then return true end
+	self.energy.ignoreUntil = nil
+end
+
 local function isNaturalEnergyGain(delta, previous, current, maxEnergy)
+	if playerClass == 'DRUID' then return current < maxEnergy and delta >= 18 and delta <= 22 end
 	if delta >= 18 and delta <= 22 then return true end
 	if playerClass == 'ROGUE' and delta >= 38 and delta <= 42 then return true end
-	return current == maxEnergy and previous < maxEnergy and maxEnergy - previous <= (playerClass == 'ROGUE' and 42 or 20)
+	return playerClass == 'ROGUE' and current == maxEnergy and previous < maxEnergy and maxEnergy - previous <= 42
 end
 
 function frame:baselineEnergy()
@@ -65,6 +75,7 @@ function frame:observeEnergy(now, baselineOnly)
 	if playerClass ~= 'DRUID' and playerClass ~= 'ROGUE' then return end
 	local displayPower = UnitPowerType('player')
 	if self.energy.displayPower and self.energy.displayPower ~= displayPower then
+		if playerClass == 'DRUID' then self.energy.ignoreUntil = now + DRUID_FORM_ENERGY_IGNORE_WINDOW end
 		self:baselineEnergy()
 		return
 	end
@@ -79,11 +90,12 @@ function frame:observeEnergy(now, baselineOnly)
 
 	if energy > previous then
 		local skipped = consumeSkip(self, POWER_ENERGY, now)
+		local ignored = isEnergySyncIgnored(self, now)
 		local delta = energy - previous
 		local elapsed = type(self.energy.lastTickTime) == 'number' and now - self.energy.lastTickTime
 		local ready = not self.energy.synced or type(elapsed) ~= 'number' or elapsed >= getEnergyInterval(self) - TICK_TOLERANCE
 
-		if not skipped and ready and isNaturalEnergyGain(delta, previous, energy, maxEnergy) then
+		if not skipped and not ignored and ready and isNaturalEnergyGain(delta, previous, energy, maxEnergy) then
 			self.energy.synced = true
 			self.energy.lastTickTime = now
 			self.resTime[POWER_ENERGY] = now
@@ -202,8 +214,12 @@ frame:SetScript('OnEvent', function(self, event, unit, powerToken)
 	elseif event == 'ACTIVE_TALENT_GROUP_CHANGED' then
 		self.skip[POWER_MANA] = now + SKIP_WINDOW
 	elseif event == 'UNIT_DISPLAYPOWER' then
-		if unit == 'player' then self:baselineEnergy() end
+		if unit == 'player' then
+			if playerClass == 'DRUID' then self.energy.ignoreUntil = now + DRUID_FORM_ENERGY_IGNORE_WINDOW end
+			self:baselineEnergy()
+		end
 	elseif event == 'UPDATE_SHAPESHIFT_FORM' then
+		if playerClass == 'DRUID' then self.energy.ignoreUntil = now + DRUID_FORM_ENERGY_IGNORE_WINDOW end
 		self:baselineEnergy()
 	elseif event == 'UNIT_POWER_UPDATE' then
 		if unit == 'player' then

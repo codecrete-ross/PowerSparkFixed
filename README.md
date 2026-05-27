@@ -69,10 +69,16 @@ update, the addon avoids guessing when that would create a worse sync point.
    `Interface\AddOns\PowerSparkFixed`.
 3. Restart the game or run `/reload`.
 
-For the current local TBC Anniversary install, the addon path is typically:
+For the current local TBC Anniversary install, the addon path is:
 
 ```text
-World of Warcraft\_anniversary_\Interface\AddOns\PowerSparkFixed
+G:\Battle.net Games\World of Warcraft\_anniversary_\Interface\AddOns\PowerSparkFixed
+```
+
+Local deploy from this repository:
+
+```powershell
+Copy-Item -Path .\PowerSpark.lua, .\Options.lua, .\PowerSparkFixed.toc, .\README.md, .\Logo.png, .\Logo.tga -Destination 'G:\Battle.net Games\World of Warcraft\_anniversary_\Interface\AddOns\PowerSparkFixed' -Force
 ```
 
 ## Development
