@@ -1,5 +1,13 @@
-# 1.1.0
+## 1.1.0
 
-- Prevent druid cat-form spark resets from ambiguous capped energy gains.
-- Ignore druid energy sync briefly during form/display-power transitions.
-- Document the local TBC Anniversary deploy path and copy command.
+- Fixed cat-form energy sparks sometimes jumping back to the start of the bar before the tick cycle finished
+- Form changes and powershifts now wait for the next clear energy tick before resyncing the spark
+- Full-energy cat-form gains are no longer used as tick timing when they could be a clipped powershift or Furor gain
+
+## 1.0.0
+
+- Initial release
+- Energy spark for Rogues and cat-form Druids
+- Mana spark with five-second rule timing
+- Full-energy and full-mana hide options
+- Support for Blizzard player bars, DruidBarFrame, Shadowed Unit Frames, ElvUI, Statusbars2, and BiechuUnitFrames
