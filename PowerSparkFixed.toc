@@ -4,7 +4,7 @@
 ## Notes-ruRU: Восстановление энергии и маны мерцанием
 ## Notes-zhCN: 能量和法力恢复闪动
 
-## Version: 1.1.1
+## Version: 1.1.2
 ## Author: starpt, codecrete-ross
 ## SavedVariablesPerCharacter: PowerSparkFixedDB
 ## IconTexture: Interface\AddOns\PowerSparkFixed\Logo

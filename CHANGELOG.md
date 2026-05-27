@@ -1,3 +1,7 @@
+## 1.1.2
+
+- Fixed CurseForge release changelog display
+
 ## 1.1.1
 
 - Corrected the 1.1.0 changelog and release notes to use player-facing addon wording
