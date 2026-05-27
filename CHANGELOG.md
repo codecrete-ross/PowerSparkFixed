@@ -1,3 +1,7 @@
+## 1.1.1
+
+- Corrected the 1.1.0 changelog and release notes to use player-facing addon wording
+
 ## 1.1.0
 
 - Fixed cat-form energy sparks sometimes jumping back to the start of the bar before the tick cycle finished
